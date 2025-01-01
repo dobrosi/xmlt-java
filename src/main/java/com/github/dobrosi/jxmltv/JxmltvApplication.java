@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -16,10 +17,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 @Slf4j
 public class JxmltvApplication {
-	public static final String CHANNEL_PREFIX = "<channel id=\"";
-	public static final String DISPLAY_NAME_PREFIX = "<display-name>";
-	public static final String ICON_PREFIX = "<icon src=\"";
-	public static final String DISPLAY_NAME_POSTFIX = "</display-name>";
+	public static final String CHANNEL_PREFIX = "<channel";
+	public static final String DISPLAY_NAME_PREFIX = "<display-name";
+	public static final String ID_PREFIX = " id=\"";
+	public static final String ICON_PREFIX = "<icon";
 	public static final String CHANNEL_POSTFIX = "</channel>";
 	public static final String PROGRAMME_PREFIX = "<programme";
 	public static final String DIGI = "digi";
@@ -54,14 +55,15 @@ public class JxmltvApplication {
 
 		try {
 			try(var writer = Files.newBufferedWriter(Path.of(outputFilePath))) {
-				Files.lines(Path.of(filePath))
-					.forEach(line -> {
-                        try {
-                            parse(writer, line);
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-                    });
+				try(Stream<String> lines = Files.lines(Path.of(filePath))){
+					lines.forEach(line -> {
+						try {
+							parse(writer, line);
+						} catch (IOException e) {
+							throw new RuntimeException(e);
+						}
+					});
+				}
 			}
 		} catch (IOException e) {
             log.error("Hiba történt a fájl olvasása közben: {}", e.getMessage());
@@ -76,7 +78,7 @@ public class JxmltvApplication {
 				return;
 			} else if (line.contains(DISPLAY_NAME_PREFIX)) {
 				if (pChannelLine != null) {
-					String displayName = getWord(line, DISPLAY_NAME_PREFIX, DISPLAY_NAME_POSTFIX);
+					String displayName = getWord(line, ">", "<");
 					ids.put(pChannelId, mapId(displayName));
 					write(writer, pChannelLine);
 					line = line.replace(displayName, mapName(displayName));
@@ -141,7 +143,7 @@ public class JxmltvApplication {
 	}
 
 	private String getChannelId(String line) {
-		return getWord(line, CHANNEL_PREFIX, "\"");
+		return getWord(line, ID_PREFIX, "\"");
 	}
 
 	private String getWord(String line, String d1, String d2) {
