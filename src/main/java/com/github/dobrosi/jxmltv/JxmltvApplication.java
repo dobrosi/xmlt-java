@@ -89,7 +89,7 @@ public class JxmltvApplication {
 				}
 			} else if (line.contains(ICON_PREFIX)) {
 				if (isNotDigi()) {
-//					return;
+					return;
 				}
 			} else if (line.contains(CHANNEL_POSTFIX)) {
 				if (pImgUrl != null) {
