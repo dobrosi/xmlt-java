@@ -70,10 +70,8 @@ public class CsvToMapProcessor {
             String line;
             while ((line = br.readLine()) != null) {
                 String[] parts = line.split(",", -1);
-                if (parts.length >= 2) {
-                    String key = parts[0].trim();
-                    key = !key.isBlank() ? key : parts[1].trim();
-                    contentMap.put(key, new Channel(parts));
+                if (parts.length >= 2 && !parts[0].isBlank()) {
+                    contentMap.put(parts[0].trim(), new Channel(parts));
                 }
             }
         } catch (IOException e) {
