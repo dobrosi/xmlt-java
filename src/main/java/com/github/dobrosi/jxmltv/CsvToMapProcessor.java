@@ -9,14 +9,13 @@ import java.util.Map;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 
 @Slf4j
 public class CsvToMapProcessor {
     @Data
     public static class Channel {
         private String originalId;
-        private String id;
+        private Object id;
         private String name;
         private String imgUrl;
 
@@ -24,14 +23,14 @@ public class CsvToMapProcessor {
             originalId = parts[0].trim();
             id = parts[1].trim();
             String word;
-            name = parts.length > 2 && !(word = parts[2].trim()).isBlank() ? word : id;
+            name = parts.length > 2 && !(word = parts[2].trim()).isBlank() ? word : (String) id;
             imgUrl = parts.length > 3 && !(word = parts[3].trim()).isBlank() ? word : null;
         }
     }
 
-    public static Map<String, Map<String, Channel>> getMap() {
+    public static Map<Object, Map<Object, Channel>> getMap() {
         String directoryPath = "mapper";
-        val result = processCsvFiles(directoryPath);
+        var result = processCsvFiles(directoryPath);
         result.forEach((fileName, fileContentMap) -> {
             System.out.println("File: " + fileName);
             fileContentMap.forEach((key, value) ->
@@ -40,8 +39,8 @@ public class CsvToMapProcessor {
         return result;
     }
 
-    private static Map<String, Map<String, Channel>> processCsvFiles(String directoryPath) {
-        Map<String, Map<String, Channel>> csvDataMap = new HashMap<>();
+    private static Map<Object, Map<Object, Channel>> processCsvFiles(String directoryPath) {
+        Map<Object, Map<Object, Channel>> csvDataMap = new HashMap<>();
         File directory = new File(directoryPath);
 
         if (!directory.exists() || !directory.isDirectory()) {
@@ -55,7 +54,7 @@ public class CsvToMapProcessor {
             for (File file : files) {
                 String fileNameWithoutExtension = file.getName()
                     .replaceFirst("\\.[^.]+$", "");
-                Map<String, Channel> fileContentMap = processCsvFile(file);
+                Map<Object, Channel> fileContentMap = processCsvFile(file);
                 csvDataMap.put(fileNameWithoutExtension, fileContentMap);
             }
         }
@@ -63,8 +62,8 @@ public class CsvToMapProcessor {
         return csvDataMap;
     }
 
-    private static Map<String, Channel> processCsvFile(File file) {
-        Map<String, Channel> contentMap = new HashMap<>();
+    private static Map<Object, Channel> processCsvFile(File file) {
+        Map<Object, Channel> contentMap = new HashMap<>();
 
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             String line;
