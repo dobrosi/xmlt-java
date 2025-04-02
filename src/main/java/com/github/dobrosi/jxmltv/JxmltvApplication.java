@@ -84,8 +84,6 @@ public class JxmltvApplication {
 					line = line.replace(displayName, mapName(displayName));
 					pChannelLine = null;
 					pImgUrl = mapImgUrl(displayName);
-				} else if (isNotDigi()) {
-					return;
 				}
 			} else if (line.contains(ICON_PREFIX)) {
 /*
@@ -107,10 +105,6 @@ public class JxmltvApplication {
 			}
 		}
 		write(writer, line);
-	}
-
-	private boolean isNotDigi() {
-		return !theKey.equals(DIGI);
 	}
 
 	private Object mapValue(Object defaultValue, Function<CsvToMapProcessor.Channel, Object> getter) {
